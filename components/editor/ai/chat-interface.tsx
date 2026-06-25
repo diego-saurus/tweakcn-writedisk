@@ -2,8 +2,6 @@
 
 import { useChatContext } from "@/hooks/use-chat-context";
 import { useAIThemeGenerationCore } from "@/hooks/use-ai-theme-generation-core";
-import { useGuards } from "@/hooks/use-guards";
-import { usePostLoginAction } from "@/hooks/use-post-login-action";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AIPromptData } from "@/types/ai";
@@ -28,22 +26,14 @@ export function ChatInterface() {
   const { isGeneratingTheme, generateThemeCore, cancelThemeGeneration } =
     useAIThemeGenerationCore();
 
-  const { checkValidSession, checkValidSubscription } = useGuards();
-
   const hasMessages = messages.length > 0;
   const [editingMessageIndex, setEditingMessageIndex] = React.useState<number | null>(null);
 
   const handleGenerateFromSuggestion = (promptData: AIPromptData | undefined) => {
-    if (!checkValidSession("signup", "AI_GENERATE_FROM_CHAT_SUGGESTION", { promptData })) return;
-    if (!checkValidSubscription()) return;
-
     generateThemeCore(promptData);
   };
 
   const handleRetry = (messageIndex: number) => {
-    if (!checkValidSession("signup", "AI_GENERATE_RETRY", { messageIndex })) return;
-    if (!checkValidSubscription()) return;
-
     setEditingMessageIndex(null);
     const messageToRetry = messages[messageIndex];
 
@@ -59,8 +49,6 @@ export function ChatInterface() {
   };
 
   const handleEdit = (messageIndex: number) => {
-    if (!checkValidSession()) return; // Simply act as an early return
-
     setEditingMessageIndex(messageIndex);
   };
 
@@ -69,28 +57,10 @@ export function ChatInterface() {
   };
 
   const handleEditSubmit = (messageIndex: number, promptData: AIPromptData) => {
-    if (!checkValidSession("signup", "AI_GENERATE_EDIT", { messageIndex, promptData })) {
-      return;
-    }
-    if (!checkValidSubscription()) return;
-
-    // Reset messages up to the edited message
     resetMessagesUpToIndex(messageIndex);
     setEditingMessageIndex(null);
     generateThemeCore(promptData);
   };
-
-  usePostLoginAction("AI_GENERATE_FROM_CHAT_SUGGESTION", ({ promptData }) => {
-    handleGenerateFromSuggestion(promptData);
-  });
-
-  usePostLoginAction("AI_GENERATE_RETRY", ({ messageIndex }) => {
-    handleRetry(messageIndex);
-  });
-
-  usePostLoginAction("AI_GENERATE_EDIT", ({ messageIndex, promptData }) => {
-    handleEditSubmit(messageIndex, promptData);
-  });
 
   return (
     <section className="@container relative isolate z-1 mx-auto flex size-full max-w-[49rem] flex-1 flex-col justify-center">
@@ -119,7 +89,6 @@ export function ChatInterface() {
         )}
       </div>
 
-      {/* Chat form input and suggestions */}
       <div className="relative z-1 mx-auto w-full px-4 pb-4">
         <div
           className={cn(

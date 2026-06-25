@@ -5,9 +5,6 @@ import { ThemeSaveDialog } from "@/components/editor/theme-save-dialog";
 import { toast } from "@/components/ui/use-toast";
 import { useCreateTheme, useUpdateTheme } from "@/hooks/themes";
 import { useAIThemeGenerationCore } from "@/hooks/use-ai-theme-generation-core";
-import { usePostLoginAction } from "@/hooks/use-post-login-action";
-import { authClient } from "@/lib/auth-client";
-import { useAuthStore } from "@/store/auth-store";
 import { useEditorStore } from "@/store/editor-store";
 import { useThemePresetStore } from "@/store/theme-preset-store";
 import { parseCssInput } from "@/utils/parse-css-input";
@@ -16,7 +13,6 @@ import { createContext, ReactNode, useContext, useState } from "react";
 
 type PendingAction = "share" | "v0" | null;
 
-// Get contextual copy for the save dialog based on the pending action
 function getSaveDialogCopy(pendingAction: PendingAction) {
   switch (pendingAction) {
     case "share":
@@ -37,7 +33,6 @@ function getSaveDialogCopy(pendingAction: PendingAction) {
 }
 
 interface DialogActionsContextType {
-  // Dialog states
   cssImportOpen: boolean;
   codePanelOpen: boolean;
   saveDialogOpen: boolean;
@@ -50,13 +45,11 @@ interface DialogActionsContextType {
   pendingAction: PendingAction;
   existingThemeName: string | undefined;
 
-  // Dialog actions
   setCssImportOpen: (open: boolean) => void;
   setCodePanelOpen: (open: boolean) => void;
   setSaveDialogOpen: (open: boolean) => void;
   setShareDialogOpen: (open: boolean) => void;
 
-  // Handler functions
   handleCssImport: (css: string) => void;
   handleSaveClick: (options?: { shareAfterSave?: boolean; openInV0AfterSave?: boolean }) => void;
   handleShareClick: (id?: string) => Promise<void>;
@@ -77,8 +70,6 @@ function useDialogActionsStore(): DialogActionsContextType {
   const { themeState, setThemeState, applyThemePreset, hasThemeChangedFromCheckpoint, hasUnsavedChanges } =
     useEditorStore();
   const { getPreset } = useThemePresetStore();
-  const { data: session } = authClient.useSession();
-  const { openAuthDialog } = useAuthStore();
   const createThemeMutation = useCreateTheme();
   const updateThemeMutation = useUpdateTheme();
   const { isGeneratingTheme } = useAIThemeGenerationCore();
@@ -87,20 +78,6 @@ function useDialogActionsStore(): DialogActionsContextType {
   const currentPreset = themeState?.preset ? getPreset(themeState.preset) : undefined;
   const isOnSavedPreset = !!currentPreset && currentPreset.source === "SAVED" && hasUnsavedChanges();
   const existingThemeName = isOnSavedPreset ? currentPreset.label : undefined;
-
-  usePostLoginAction("SAVE_THEME", () => {
-    setSaveDialogOpen(true);
-  });
-
-  usePostLoginAction("SAVE_THEME_FOR_SHARE", () => {
-    setSaveDialogOpen(true);
-    setPendingAction("share");
-  });
-
-  usePostLoginAction("SAVE_THEME_FOR_V0", () => {
-    setSaveDialogOpen(true);
-    setPendingAction("v0");
-  });
 
   const handleCssImport = (css: string) => {
     const { lightColors, darkColors } = parseCssInput(css);
@@ -122,14 +99,6 @@ function useDialogActionsStore(): DialogActionsContextType {
   };
 
   const handleSaveClick = (options?: { shareAfterSave?: boolean; openInV0AfterSave?: boolean }) => {
-    if (!session) {
-      let action: "SAVE_THEME" | "SAVE_THEME_FOR_SHARE" | "SAVE_THEME_FOR_V0" = "SAVE_THEME";
-      if (options?.shareAfterSave) action = "SAVE_THEME_FOR_SHARE";
-      if (options?.openInV0AfterSave) action = "SAVE_THEME_FOR_V0";
-      openAuthDialog("signin", action);
-      return;
-    }
-
     setSaveDialogOpen(true);
     if (options?.shareAfterSave) {
       setPendingAction("share");
@@ -178,7 +147,7 @@ function useDialogActionsStore(): DialogActionsContextType {
     const currentPreset = presetId ? getPreset(presetId) : undefined;
 
     if (!currentPreset) {
-      setShareUrl(`https://tweakcn.com/editor/theme`);
+      setShareUrl(`${window.location.origin}/editor/theme`);
       setShareDialogOpen(true);
       return;
     }
@@ -192,20 +161,18 @@ function useDialogActionsStore(): DialogActionsContextType {
     });
 
     const url = isSavedPreset
-      ? `https://tweakcn.com/themes/${id}`
-      : `https://tweakcn.com/editor/theme?theme=${id}`;
+      ? `${window.location.origin}/themes/${id}`
+      : `${window.location.origin}/editor/theme?theme=${id}`;
 
     setShareUrl(url);
     setShareDialogOpen(true);
   };
 
-  // Internal helper to open v0 with a theme
   const openInV0 = (id?: string, name?: string) => {
     const presetId = id ?? themeState.preset;
     if (!presetId) return;
 
     const currentPreset = getPreset(presetId);
-    // If an explicit ID is passed but not found in presets, treat as a saved/database theme
     const isSavedPreset = id ? true : !!currentPreset && currentPreset.source === "SAVED";
     const themeName = name || currentPreset?.label || presetId;
 
@@ -216,8 +183,8 @@ function useDialogActionsStore(): DialogActionsContextType {
     });
 
     const themeUrl = isSavedPreset
-      ? `https://tweakcn.com/r/v0/${presetId}`
-      : `https://tweakcn.com/r/v0/${presetId}.json`;
+      ? `${window.location.origin}/r/v0/${presetId}`
+      : `${window.location.origin}/r/v0/${presetId}.json`;
     const title = `"${themeName}" from tweakcn`.slice(0, 32);
     const v0Url = `https://v0.dev/chat/api/open?url=${encodeURIComponent(themeUrl)}&title=${encodeURIComponent(title)}`;
     window.open(v0Url, "_blank", "noopener,noreferrer");
@@ -254,7 +221,6 @@ function useDialogActionsStore(): DialogActionsContextType {
   };
 
   const value = {
-    // Dialog states
     cssImportOpen,
     codePanelOpen,
     saveDialogOpen,
@@ -267,13 +233,11 @@ function useDialogActionsStore(): DialogActionsContextType {
     pendingAction,
     existingThemeName,
 
-    // Dialog actions
     setCssImportOpen,
     setCodePanelOpen,
     setSaveDialogOpen,
     setShareDialogOpen,
 
-    // Handler functions
     handleCssImport,
     handleSaveClick,
     handleShareClick,
@@ -295,7 +259,6 @@ export function DialogActionsProvider({ children }: { children: ReactNode }) {
     <DialogActionsContext value={store}>
       {children}
 
-      {/* Global Dialogs */}
       <CssImportDialog
         open={store.cssImportOpen}
         onOpenChange={store.setCssImportOpen}

@@ -1,6 +1,5 @@
 "use client";
 
-import { SUBSCRIPTION_STATUS_QUERY_KEY } from "@/hooks/use-subscription";
 import { toast } from "@/hooks/use-toast";
 import { useAIChatStore } from "@/store/ai-chat-store";
 import { ChatMessage } from "@/types/ai";
@@ -8,7 +7,6 @@ import { applyGeneratedTheme } from "@/utils/ai/apply-theme";
 
 import { parseAiSdkTransportError } from "@/lib/ai/parse-ai-sdk-transport-error";
 import { useChat } from "@ai-sdk/react";
-import { useQueryClient } from "@tanstack/react-query";
 import { DefaultChatTransport } from "ai";
 import { createContext, useContext, useEffect, useRef } from "react";
 
@@ -20,7 +18,6 @@ interface ChatContext extends ReturnType<typeof useChat<ChatMessage>> {
 const ChatContext = createContext<ChatContext | null>(null);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
-  const queryClient = useQueryClient();
   const storedMessages = useAIChatStore((s) => s.messages);
   const setStoredMessages = useAIChatStore((s) => s.setMessages);
 
@@ -47,9 +44,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         if (data.status === "ready") applyGeneratedTheme(data.themeStyles);
       }
     },
-    onFinish: () => {
-      queryClient.invalidateQueries({ queryKey: [SUBSCRIPTION_STATUS_QUERY_KEY] });
-    },
+    onFinish: () => {},
   });
 
   const startNewChat = () => {

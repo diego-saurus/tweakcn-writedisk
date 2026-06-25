@@ -6,13 +6,11 @@ import { useThemesData } from "@/hooks/themes";
 import { CodeButton } from "./code-button";
 import { ImportButton } from "./import-button";
 import { MoreOptions } from "./more-options";
-import { PublishButton } from "./publish-button";
 import { ResetButton } from "./reset-button";
 import { SaveButton } from "./save-button";
 import { ShareButton } from "./share-button";
 import { ThemeToggle } from "./theme-toggle";
 import { UndoRedoButtons } from "./undo-redo-buttons";
-import { useMemo } from "react";
 
 interface ActionBarButtonsProps {
   onImportClick: () => void;
@@ -36,15 +34,11 @@ export function ActionBarButtons({
   const currentPreset = themeState?.preset ? getPreset(themeState?.preset) : undefined;
   const isSavedPreset = !!currentPreset && currentPreset.source === "SAVED";
 
-  const isPublished = useMemo(() => {
-    if (!isSavedPreset || !themes || !themeState.preset) return false;
-    const theme = themes.find((t) => t.id === themeState.preset);
-    return theme?.isPublished ?? false;
-  }, [isSavedPreset, themes, themeState.preset]);
-
   const handleReset = () => {
     resetToCurrentPreset();
   };
+
+  void themes;
 
   return (
     <div className="flex items-center gap-1">
@@ -60,15 +54,7 @@ export function ActionBarButtons({
       </div>
       <Separator orientation="vertical" className="mx-1 h-8" />
       <ShareButton onClick={() => onShareClick(themeState.preset)} disabled={isGeneratingTheme} />
-      {isSavedPreset && !hasUnsavedChanges() ? (
-        <PublishButton
-          themeId={themeState.preset as string}
-          isPublished={isPublished}
-          disabled={isGeneratingTheme}
-        />
-      ) : (
-        <SaveButton onClick={onSaveClick} isSaving={isSaving} disabled={isGeneratingTheme} />
-      )}
+      <SaveButton onClick={onSaveClick} isSaving={isSaving} disabled={isGeneratingTheme || !isSavedPreset} />
       <CodeButton onClick={onCodeClick} disabled={isGeneratingTheme} />
     </div>
   );

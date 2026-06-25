@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+
 import { useEditorStore } from "@/store/editor-store";
 import { useThemePresetStore } from "@/store/theme-preset-store";
 import { ThemePreset } from "@/types/theme";
@@ -185,19 +185,12 @@ const ThemePresetSelect: React.FC<ThemePresetSelectProps> = ({
 
   const presets = useThemePresetStore((store) => store.getAllPresets());
   const loadSavedPresets = useThemePresetStore((store) => store.loadSavedPresets);
-  const unloadSavedPresets = useThemePresetStore((store) => store.unloadSavedPresets);
 
   const [search, setSearch] = useState("");
 
-  const { data: session } = authClient.useSession();
-
   useEffect(() => {
-    if (session?.user) {
-      loadSavedPresets();
-    } else {
-      unloadSavedPresets();
-    }
-  }, [loadSavedPresets, unloadSavedPresets, session?.user]);
+    loadSavedPresets();
+  }, [loadSavedPresets]);
 
   const isSavedTheme = useCallback(
     (presetId: string) => {

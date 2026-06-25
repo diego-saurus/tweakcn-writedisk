@@ -2,20 +2,13 @@ import { getThemes } from "@/actions/themes";
 import { ThemesList } from "@/app/settings/components/themes-list";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { auth } from "@/lib/auth";
 import { Palette, Plus } from "lucide-react";
-import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { SettingsHeader } from "../components/settings-header";
 
+export const dynamic = "force-dynamic";
+
 export default async function ThemesPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) redirect("/editor/theme");
-
   const themes = await getThemes();
   const sortedThemes = themes.sort((a, b) => {
     return (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0);

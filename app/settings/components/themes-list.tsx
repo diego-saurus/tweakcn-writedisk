@@ -15,17 +15,12 @@ import { ArrowUpDown, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ThemeCard } from "./theme-card";
 
-interface ThemeWithPublished extends Theme {
-  isPublished: boolean;
-}
-
 interface ThemesListProps {
-  themes: ThemeWithPublished[];
+  themes: Theme[];
 }
 
 export function ThemesList({ themes }: ThemesListProps) {
-  const [filteredThemes, setFilteredThemes] =
-    useState<ThemeWithPublished[]>(themes);
+  const [filteredThemes, setFilteredThemes] = useState<Theme[]>(themes);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("newest");
   const isMobile = useIsMobile();
@@ -35,7 +30,6 @@ export function ThemesList({ themes }: ThemesListProps) {
       theme.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Sort based on selected option
     const sorted = [...filtered].sort((a, b) => {
       switch (sortOption) {
         case "newest":
@@ -89,11 +83,7 @@ export function ThemesList({ themes }: ThemesListProps) {
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredThemes.map((theme) => (
-              <ThemeCard
-                key={theme.id}
-                theme={theme}
-                isPublished={theme.isPublished}
-              />
+              <ThemeCard key={theme.id} theme={theme} />
             ))}
           </div>
         )}

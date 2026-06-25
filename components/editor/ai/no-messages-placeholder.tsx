@@ -2,7 +2,6 @@ import { HorizontalScrollArea } from "@/components/horizontal-scroll-area";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
-import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { AIPromptData } from "@/types/ai";
 import { createCurrentThemePrompt, createPromptDataFromPreset } from "@/utils/ai/ai-prompt";
@@ -18,9 +17,7 @@ export function NoMessagesPlaceholder({
   onGenerateTheme: (promptData: AIPromptData) => void;
   isGeneratingTheme: boolean;
 }) {
-  const { data: session } = authClient.useSession();
-  const userName = session?.user.name?.split(" ")[0];
-  const heading = `What can I help you theme${userName ? `, ${userName}` : ""}?`;
+  const heading = "What can I help you theme?";
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-4">

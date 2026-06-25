@@ -1,6 +1,4 @@
-import { AuthDialogWrapper } from "@/components/auth-dialog-wrapper";
 import { DynamicFontLoader } from "@/components/dynamic-font-loader";
-import { GetProDialogWrapper } from "@/components/get-pro-dialog-wrapper";
 import { PostHogInit } from "@/components/posthog-init";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeScript } from "@/components/theme-script";
@@ -84,8 +82,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <QueryProvider>
               <ThemeProvider defaultTheme="light">
                 <TooltipProvider>
-                  <AuthDialogWrapper />
-                  <GetProDialogWrapper />
                   <Toaster />
                   <ChatProvider>{children}</ChatProvider>
                 </TooltipProvider>

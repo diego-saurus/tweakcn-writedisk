@@ -6,9 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useAIChatForm } from "@/hooks/use-ai-chat-form";
 import { useAIEnhancePrompt } from "@/hooks/use-ai-enhance-prompt";
 import { useChatContext } from "@/hooks/use-chat-context";
-import { useGuards } from "@/hooks/use-guards";
-import { useSubscription } from "@/hooks/use-subscription";
-import { usePostLoginAction } from "@/hooks/use-post-login-action";
 import { MAX_IMAGE_FILES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { AIPromptData } from "@/types/ai";
@@ -37,10 +34,6 @@ export function ChatInput({
   onCancelThemeGeneration,
 }: ChatInputProps) {
   const { messages, startNewChat } = useChatContext();
-  const { checkValidSession, checkValidSubscription } = useGuards();
-  const { subscriptionStatus } = useSubscription();
-  const isPro = subscriptionStatus?.isSubscribed ?? false;
-  const hasFreeRequestsLeft = (subscriptionStatus?.requestsRemaining ?? 0) > 0;
 
   const {
     editorContentDraft,
@@ -68,9 +61,6 @@ export function ChatInput({
     useAIEnhancePrompt();
 
   const handleEnhancePrompt = () => {
-    if (!checkValidSession() || !checkValidSubscription()) return;
-
-    // Only send images that are not loading, and strip loading property
     const images = uploadedImages.filter((img) => !img.loading).map(({ url }) => ({ url }));
     startEnhance({ ...promptData, images });
   };
@@ -87,10 +77,8 @@ export function ChatInput({
   };
 
   const handleGenerateSubmit = async () => {
-    // Only send images that are not loading, and strip loading property
     const images = uploadedImages.filter((img) => !img.loading).map(({ url }) => ({ url }));
 
-    // Proceed only if there is text, or at least one image
     if (isEmptyPrompt && images.length === 0) return;
 
     const payload: ThemeGenerationPayload = {
@@ -103,15 +91,8 @@ export function ChatInput({
       },
     };
 
-    if (!checkValidSession("signup", "AI_GENERATE_FROM_CHAT", payload)) return;
-    if (!checkValidSubscription()) return;
-
     generateTheme(payload);
   };
-
-  usePostLoginAction("AI_GENERATE_FROM_CHAT", (payload) => {
-    generateTheme(payload);
-  });
 
   return (
     <div className="relative transition-all contain-layout">
@@ -161,7 +142,7 @@ export function ChatInput({
           </TooltipWrapper>
 
           <div className="flex items-center gap-2">
-            {(isPro || hasFreeRequestsLeft) && promptData?.content ? (
+            {promptData?.content ? (
               <EnhancePromptButton
                 isEnhancing={isEnhancingPrompt}
                 onStart={handleEnhancePrompt}

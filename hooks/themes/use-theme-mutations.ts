@@ -4,33 +4,15 @@ import { themeKeys } from "./use-themes-data";
 import { ThemeStyles, Theme } from "@/types/theme";
 import { toast } from "@/components/ui/use-toast";
 import { useThemePresetStore } from "@/store/theme-preset-store";
-import posthog from "posthog-js";
 import { useRouter } from "next/navigation";
-import { useGetProDialogStore } from "@/store/get-pro-dialog-store";
-import { MAX_FREE_THEMES } from "@/lib/constants";
-import { ErrorCode } from "@/types/errors";
 
 function handleMutationError(error: Error, operation: string) {
   console.error(`Theme ${operation} error:`, error);
 
   const errorName = error.name;
 
-  if (errorName !== "UnauthorizedError" && errorName !== "ValidationError") {
-    try {
-      posthog.capture("theme_mutation_error", {
-        operation,
-        error: error.message,
-        errorName,
-      });
-    } catch (posthogError) {
-      console.error("Failed to log to PostHog:", posthogError);
-    }
-  }
-
   const getErrorMessage = (error: Error) => {
     switch (error.name) {
-      case "UnauthorizedError":
-        return "Please sign in to continue.";
       case "ValidationError":
         return error.message || "Invalid input provided.";
       case "ThemeNotFoundError":
@@ -52,27 +34,10 @@ function handleMutationError(error: Error, operation: string) {
 export function useCreateTheme() {
   const queryClient = useQueryClient();
   const { registerPreset } = useThemePresetStore();
-  const { openGetProDialog } = useGetProDialogStore();
 
   return useMutation({
     mutationFn: async (data: { name: string; styles: ThemeStyles }) => {
-      const result = await createTheme(data);
-
-      // Handle theme limit error explicitly (returns ActionResult, not thrown)
-      if (!result.success) {
-        if (result.error.code === ErrorCode.THEME_LIMIT_REACHED) {
-          toast({
-            title: "Theme limit reached",
-            description: `You have reached the limit of ${MAX_FREE_THEMES} themes.`,
-            variant: "destructive",
-          });
-          openGetProDialog();
-        }
-        // Throw to trigger onError for other error handling
-        throw new Error(result.error.message);
-      }
-
-      return result.data;
+      return await createTheme(data);
     },
     onSuccess: (data) => {
       queryClient.setQueryData(themeKeys.lists(), (old: Theme[] | undefined) => {
@@ -92,10 +57,6 @@ export function useCreateTheme() {
       });
     },
     onError: (error) => {
-      // Theme limit errors are already handled in mutationFn, skip duplicate toast
-      if ((error as Error).message.includes("limit")) {
-        return;
-      }
       handleMutationError(error as Error, "create");
     },
     onSettled: () => {
