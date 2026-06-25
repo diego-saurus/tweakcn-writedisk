@@ -38,9 +38,6 @@ importers:
       '@lexical/react':
         specifier: 0.31.0
         version: 0.31.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(yjs@13.6.26)
-      '@neondatabase/serverless':
-        specifier: 1.0.0
-        version: 1.0.0
       '@tanstack/react-query':
         specifier: 5.81.2
         version: 5.81.2(react@19.0.0)
@@ -97,7 +94,7 @@ importers:
         version: 16.5.0
       drizzle-orm:
         specifier: 0.42.0
-        version: 0.42.0(@libsql/client@0.15.4)(@neondatabase/serverless@1.0.0)(@opentelemetry/api@1.9.0)(@types/pg@8.11.13)(kysely@0.27.6)(pg@8.14.1)
+        version: 0.42.0(@libsql/client@0.15.4)(@neondatabase/serverless@1.0.0)(@opentelemetry/api@1.9.0)(@types/pg@8.11.13)(kysely@0.27.6)(pg@8.14.1)(postgres@3.4.5)
       embla-carousel-react:
         specifier: 8.6.0
         version: 8.6.0(react@19.0.0)
@@ -131,6 +128,9 @@ importers:
       openai:
         specifier: 4.96.2
         version: 4.96.2(ws@8.18.1)(zod@3.25.76)
+      postgres:
+        specifier: 3.4.5
+        version: 3.4.5
       posthog-js:
         specifier: 1.236.1
         version: 1.236.1
@@ -5749,6 +5749,10 @@ packages:
   postgres-range@1.1.4:
     resolution: {integrity: sha512-i/hbxIE9803Alj/6ytL7UHQxRvZkI9O4Sy+J3HGc4F4oo/2eQAjTSNJ0bfxyse3bH0nuVesCk+3IRLaMtG3H6w==}
 
+  postgres@3.4.5:
+    resolution: {integrity: sha512-cDWgoah1Gez9rN3H4165peY9qfpEo+SA61oQv65O3cRUE1pOEoJWwddwcqKE8XZYjbblOJlYDlLV4h67HrEVDg==}
+    engines: {node: '>=12'}
+
   posthog-js@1.236.1:
     resolution: {integrity: sha512-my3MGaQfBO4FOL0RAW2mCxDkivCyt8KOenYrbeES5D5wh3SQGy0OhDH3boTKO6b6dchsAjieqtOGoRFomKXZ+A==}
     peerDependencies:
@@ -8420,6 +8424,7 @@ snapshots:
     dependencies:
       '@types/node': 22.14.1
       '@types/pg': 8.11.13
+    optional: true
 
   '@next/env@15.4.10': {}
 
@@ -9734,6 +9739,7 @@ snapshots:
   '@types/node@22.14.1':
     dependencies:
       undici-types: 6.21.0
+    optional: true
 
   '@types/pg@8.11.13':
     dependencies:
@@ -10710,7 +10716,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.42.0(@libsql/client@0.15.4)(@neondatabase/serverless@1.0.0)(@opentelemetry/api@1.9.0)(@types/pg@8.11.13)(kysely@0.27.6)(pg@8.14.1):
+  drizzle-orm@0.42.0(@libsql/client@0.15.4)(@neondatabase/serverless@1.0.0)(@opentelemetry/api@1.9.0)(@types/pg@8.11.13)(kysely@0.27.6)(pg@8.14.1)(postgres@3.4.5):
     optionalDependencies:
       '@libsql/client': 0.15.4
       '@neondatabase/serverless': 1.0.0
@@ -10718,6 +10724,7 @@ snapshots:
       '@types/pg': 8.11.13
       kysely: 0.27.6
       pg: 8.14.1
+      postgres: 3.4.5
 
   dunder-proto@1.0.1:
     dependencies:
@@ -12858,6 +12865,8 @@ snapshots:
   postgres-interval@3.0.0: {}
 
   postgres-range@1.1.4: {}
+
+  postgres@3.4.5: {}
 
   posthog-js@1.236.1:
     dependencies:

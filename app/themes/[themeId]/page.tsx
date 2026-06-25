@@ -8,8 +8,6 @@ interface ThemePageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
-
 export async function generateMetadata({ params }: ThemePageProps): Promise<Metadata> {
   const { themeId } = await params;
   const theme = await getTheme(themeId);
@@ -38,3 +36,4 @@ export default async function ThemePage({ params }: ThemePageProps) {
     </div>
   );
 }
+
