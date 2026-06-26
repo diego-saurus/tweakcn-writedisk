@@ -1,9 +1,9 @@
 import { Separator } from "@/components/ui/separator";
 import { useAIThemeGenerationCore } from "@/hooks/use-ai-theme-generation-core";
 import { useEditorStore } from "@/store/editor-store";
-import { useThemePresetStore } from "@/store/theme-preset-store";
 import { useThemesData } from "@/hooks/themes";
 import { CodeButton } from "./code-button";
+import { DiskButton } from "./disk-button";
 import { ImportButton } from "./import-button";
 import { MoreOptions } from "./more-options";
 import { ResetButton } from "./reset-button";
@@ -29,10 +29,7 @@ export function ActionBarButtons({
 }: ActionBarButtonsProps) {
   const { themeState, resetToCurrentPreset, hasUnsavedChanges } = useEditorStore();
   const { isGeneratingTheme } = useAIThemeGenerationCore();
-  const { getPreset } = useThemePresetStore();
   const { data: themes } = useThemesData();
-  const currentPreset = themeState?.preset ? getPreset(themeState?.preset) : undefined;
-  const isSavedPreset = !!currentPreset && currentPreset.source === "SAVED";
 
   const handleReset = () => {
     resetToCurrentPreset();
@@ -54,8 +51,9 @@ export function ActionBarButtons({
       </div>
       <Separator orientation="vertical" className="mx-1 h-8" />
       <ShareButton onClick={() => onShareClick(themeState.preset)} disabled={isGeneratingTheme} />
-      <SaveButton onClick={onSaveClick} isSaving={isSaving} disabled={isGeneratingTheme || !isSavedPreset} />
+      <SaveButton onClick={onSaveClick} isSaving={isSaving} disabled={isGeneratingTheme} />
       <CodeButton onClick={onCodeClick} disabled={isGeneratingTheme} />
+      <DiskButton disabled={isGeneratingTheme} />
     </div>
   );
 }

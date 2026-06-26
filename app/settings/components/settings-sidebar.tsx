@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Palette, LucideIcon } from "lucide-react";
+import { HardDrive, Palette, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -13,6 +13,7 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/settings/themes", label: "Themes", icon: Palette },
+  { href: "/settings/disk", label: "Disk Sync", icon: HardDrive },
 ];
 
 export function SettingsSidebar() {

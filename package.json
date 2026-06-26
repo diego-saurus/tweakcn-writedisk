@@ -14,6 +14,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@ai-sdk/google": "^2.0.76",
     "@ai-sdk/openai": "2.0.42",
     "@ai-sdk/react": "2.0.28",
     "@base-ui-components/react": "1.0.0-beta.2",

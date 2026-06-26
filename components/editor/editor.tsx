@@ -3,6 +3,7 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DialogActionsProvider } from "@/hooks/use-dialog-actions";
+import { useDiskWrite } from "@/hooks/use-disk-write";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEditorStore } from "@/store/editor-store";
 import { Theme, ThemeStyles } from "@/types/theme";
@@ -11,6 +12,11 @@ import React, { use, useEffect } from "react";
 import { ActionBar } from "./action-bar/action-bar";
 import ThemeControlPanel from "./theme-control-panel";
 import ThemePreviewPanel from "./theme-preview-panel";
+
+function DiskSync() {
+  useDiskWrite();
+  return null;
+}
 
 interface EditorProps {
   themePromise: Promise<Theme | null>;
@@ -66,6 +72,7 @@ const Editor: React.FC<EditorProps> = ({ themePromise }) => {
   if (isMobile) {
     return (
       <DialogActionsProvider>
+        <DiskSync />
         <div className="relative isolate flex flex-1 overflow-hidden">
           <div className="size-full flex-1 overflow-hidden">
             <Tabs defaultValue="controls" className="h-full">
@@ -103,6 +110,7 @@ const Editor: React.FC<EditorProps> = ({ themePromise }) => {
   // Desktop layout
   return (
     <DialogActionsProvider>
+      <DiskSync />
       <div className="relative isolate flex flex-1 overflow-hidden">
         <div className="size-full">
           <ResizablePanelGroup orientation="horizontal" className="isolate">
