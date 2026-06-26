@@ -10,8 +10,7 @@
     "generate-theme-registry": "tsx scripts/generate-theme-registry.ts && tsx scripts/generate-registry.ts",
     "minify-live-preview": "pnpm dlx terser public/live-preview.js -o public/live-preview.min.js -c -m",
     "prebuild": "pnpm generate-theme-registry",
-    "postbuild": "pnpm minify-live-preview",
-    "prepare": "husky"
+    "postbuild": "pnpm minify-live-preview"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.76",
@@ -97,7 +96,6 @@
     "eslint-config-next": "15.4.10",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "husky": "9.1.7",
     "prettier": "3.5.3",
     "prettier-plugin-tailwindcss": "0.6.11",
     "raw-loader": "4.0.2",
